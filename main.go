@@ -54,6 +54,7 @@ func main() {
 	router.HandleFunc("/books/{id}", removeBook).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
+
 func getBooks(w http.ResponseWriter, r *http.Request) {
 	var book Book
 	books = []Book{}
@@ -72,6 +73,7 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(books)
 }
+
 func getBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
 	params := mux.Vars(r)
@@ -84,6 +86,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 
 }
+
 func addBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
 	var bookID int
@@ -97,6 +100,7 @@ func addBook(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(bookID)
 }
+
 func updateBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
 	json.NewDecoder(r.Body).Decode(&book)
@@ -110,5 +114,15 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(rowsUpdated)
 
 }
+
 func removeBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	result, err := db.Exec("delete from books where id = $1", params["id"])
+	logFatal(err)
+
+	rowsDeleted, err := result.RowsAffected()
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(rowsDeleted)
 }
