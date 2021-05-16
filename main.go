@@ -5,12 +5,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 
+	"golang-restful-api-booklist/driver"
 	"golang-restful-api-booklist/models"
 
 	"github.com/gorilla/mux"
-	"github.com/lib/pq"
 	"github.com/subosito/gotenv"
 )
 
@@ -28,18 +27,7 @@ func logFatal(err error) {
 }
 
 func main() {
-
-	pgUrl, err := pq.ParseURL(os.Getenv("ELEPHANTSQL_URL"))
-	logFatal(err)
-
-	db, err = sql.Open("postgres", pgUrl)
-	logFatal(err)
-
-	err = db.Ping()
-	logFatal(err)
-
-	log.Println(pgUrl)
-
+	db = driver.ConnectDB()
 	router := mux.NewRouter()
 
 	router.HandleFunc("/books", getBooks).Methods("GET")
